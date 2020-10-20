@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawing</title>
+    <link rel="shortcut icon" href="favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="css/draw.css">
+</head>
+
+<body>
+    <div id="main" hidden>
+        <header>
+            <h1>JuzDraw</h1>
+            <div id="drawNameDiv"><input type="text" id="drawName" value="Untitled"
+                    onkeydown="this.style.width = ((this.value.length + 1) * 15) + 'px';"></div>
+
+            <div>
+                <span class="material-icons">people</span>
+                <b id="userNo"></b>
+                <button id="leave" style="cursor: pointer;">Leave</button>
+                <div id="clear" title="Clear all">
+                    <span class="material-icons">delete_forever</span>
+                </div>
+            </div>
+        </header>
+
+        <div id="status">status</div>
+        <div class="selection">
+            <div>
+                <label class="btnUR btnDisable" id="undo" title="undo">
+                    <input type="button" name="type" hidden>
+                    <span class="material-icons">undo</span>
+                </label>
+                <label class="btnUR btnDisable" id="redo" title="redo">
+                    <input type="button" name="type" hidden>
+                    <span class="material-icons">redo</span>
+                </label>
+            </div>
+            <div>
+                <label>Stroke:</label>
+                <input type="range" id="size" min="1" max="100" step="1" value="5" list="ticks" class="slider">
+                <datalist id="ticks">
+                    <option value="5">
+                    <option value="10">
+                    <option value="15">
+                    <option value="20">
+                    <option value="25">
+                    <option value="30">
+                </datalist>
+            </div>
+            <div id="box">
+                <div id="preview"></div>
+            </div>
+            <div>
+                <label>Colour:</label>
+                <input type="color" id="color" list="colors">
+                <datalist id="colors">
+                    <option value="#ffffff">
+                    <option value="#ff0000">
+                    <option value="#ffa500">
+                    <option value="#ffff00">
+                    <option value="#008000">
+                    <option value="#0000ff">
+                    <option value="#4b0082">
+                    <option value="#ee82ee">
+                    <option value="#000000">
+                    <option value="#999999">
+                </datalist>
+            </div>
+            <div>
+                <label>Fill:</label>
+                <input type="color" id="fill" list="colors2" value="#ffffff">
+                <datalist id="colors2">
+                    <option value="#ffffff">
+                    <option value="#ff0000">
+                    <option value="#ffa500">
+                    <option value="#ffff00">
+                    <option value="#008000">
+                    <option value="#0000ff">
+                    <option value="#4b0082">
+                    <option value="#ee82ee">
+                    <option value="#000000">
+                    <option value="#999999">
+                </datalist>
+            </div>
+            <div id="coordinate">
+                x: <span id="xcoord">0</span>
+                y: <span id="ycoord">0</span>
+            </div>
+            <div id="svgScale"></div>
+        </div>
+        <div id="nav">
+            <!-- Creating radio buttons -->
+            <div id="type">
+                <label id="pen" title="pen">
+                    <input type="radio" name="type" value="pen" onclick="menu(this.value)">
+                    <span class="material-icons">edit</span>
+                </label>
+                <label id="cursor" title="cursor">
+                    <input type="radio" name="type" value="cursor" onclick="menu(this.value)">
+                    <span class="material-icons">open_with</span>
+                </label>
+                <label id="rect" title="rectangle">
+                    <input type="radio" name="type" value="rect" onclick="menu(this.value)">
+                    <span class="material-icons">crop_5_4</span>
+                </label>
+                <label id="circle" title="circle">
+                    <input type="radio" name="type" value="circle" onclick="menu(this.value)">
+                    <span class="material-icons">panorama_fish_eye</span>
+                </label>
+                <label id="line" title="line">
+                    <input type="radio" name="type" value="line" onclick="menu(this.value)">
+                    <span class="material-icons">horizontal_rule</span>
+                </label>
+                <label id="remove" title="remove">
+                    <input type="button" name="type" hidden>
+                    <span class="material-icons">delete</span>
+                </label>
+                <label id="upload" title="upload">
+                    <input id="file" type="file" name="file" hidden>
+                    <span class="material-icons">add_photo_alternate</span>
+                </label>
+                <label id="save" title="save">
+                    <input type="button" name="type" hidden>
+                    <span class="material-icons">save</span>
+                </label>
+            </div>
+        </div>
+
+        <svg id="content" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <svg xmlns="http://www.w3.org/2000/svg" x="10" y="10" id="draw" viewBox="0 0 3508 2480">
+                <g>
+                    <defs>
+                        <pattern id="smallGrid" width="24" height="24" patternUnits="userSpaceOnUse">
+                            <path d="M24,0L0,0,0,24" fill="none" stroke="#cccccc" stroke-width="1" />
+                        </pattern>
+                        <pattern id="grid" width="240" height="240" patternUnits="userSpaceOnUse">
+                            <rect width="240" height="240" fill="url(#smallGrid)" />
+                            <path d="M240,0L0,0,0,240" fill="none" stroke="#cccccc" stroke-width="2" />
+                        </pattern>
+                    </defs>
+
+                    <rect width="100%" height="100%" fill="white" class="notMoveable" />
+                    <rect id="bg_grid" width="100%" height="100%" fill="url(#grid)" class="notMoveable" />
+                </g>
+                <g id="cursors"></g>
+            </svg>
+        </svg>
+        <div id="users"></div>
+    </div>
+    <div id="connectionStatus" hidden></div>
+    <script src="js/signalr.js"></script>
+    <script src="js/image.js"></script>
+    <script src="js/draw.js"></script>
+</body>
+
+</html>

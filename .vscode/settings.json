@@ -1,0 +1,5 @@
+{
+    "appService.preDeployTask": "publish-release",
+    "appService.deploySubpath": "bin\\Release\\netcoreapp3.1\\publish",
+    "appService.defaultWebAppToDeploy": "/subscriptions/b5705cab-d3be-4004-bd13-409e03f84b59/resourceGroups/blackviper/providers/Microsoft.Web/sites/justdraw"
+}

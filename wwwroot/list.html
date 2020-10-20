@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawing</title>
+    <link rel="shortcut icon" href="favicon.png" type="image/png">
+    <link rel="stylesheet" href="css/list.css">
+</head>
+
+<body hidden>
+    <header>
+        <div>
+            <img src="favicon.png" alt="logo">
+            <h1>
+                JuzDraw
+            </h1>
+        </div>
+        <h2>
+            Welcome <b id="you"></b>
+        </h2>
+    </header>
+
+    <main>
+        <button id="create" disabled>Create Room</button>
+
+        <table hidden>
+            <thead>
+                <tr>
+                    <th>Room Names</th>
+                    <th>Online Users</th>
+                    <th>Join Room</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2">No rooms, why not create one? :)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div hidden>No rooms, why not create one? :)</div>
+    </main>
+
+    <script src="js/signalr.js"></script>
+    <script>
+        // ========================================================================================
+        // General
+        // ========================================================================================
+        const name = sessionStorage.getItem('name');
+        if (!name) {
+            location = 'main.html';
+            throw 'ERROR: Invalid name';
+        }
+
+        document.getElementById('you').innerText = name;
+
+        // ========================================================================================
+        // Events
+        // ========================================================================================
+        //Create room Id
+        document.getElementById('create').onclick = async e => {
+            let roomId = await con.invoke('CreateRoom');
+            location = `index.html?roomId=${roomId}`;
+        };
+
+        //Redirect to roomId with button
+        function join(roomid) {
+            location = `index.html?roomId=${roomid}`;
+        };
+
+        // ========================================================================================
+        // Connect
+        // ========================================================================================
+        const con = new signalR.HubConnectionBuilder()
+            .withUrl('/hub?page=list') // virtual websocket page
+            .build();
+
+        con.onclose(err => {
+            alert('Disconnected');
+            location = 'main.html?';
+        });
+
+        con.on('UpdateList', list => {
+            console.log(list);
+            if (list.length == 0) {
+                document.querySelector('main div').hidden = false;
+                document.querySelector('table').hidden = true;
+            }
+            else {
+                let html = '';
+                //room.id should replace with room.name
+                for (let room of list) {
+                    html += `<tr>
+                                <td>${room.name}</td>
+                                <td>${room.noUser}</td>
+                                <td><button onclick="join('${room.id}')">Join</button></td>
+                            </tr>`;
+                }
+                document.querySelector('tbody').innerHTML = html;
+                document.querySelector('table').hidden = false;
+                document.querySelector('main div').hidden = true;
+            }
+        });
+
+        con.start().then(e => {
+            document.getElementById('create').disabled = false;
+            document.querySelector('body').hidden = false;
+        });
+    </script>
+</body>
+
+</html>

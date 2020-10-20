@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawing</title>
+    <link rel="shortcut icon" href="favicon.png" type="image/png">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body hidden>
+    <header>
+        <img src="favicon.png" alt="logo">
+        <h1>JuzDraw</h1>
+    </header>
+
+    <main>
+        <form>
+            <label>
+                <p>Name:</p>
+                <input id="name" type="text" placeholder="Name" maxlength="50" autocomplete="off" autofocus>
+            </label>
+
+            <button type="submit">Let's Draw!</button>
+            <small hidden></small>
+        </form>
+    </main>
+
+    <footer>
+        Developed by Chen Yew Seng, Lim Jia Ying and Jane Choo En Wei
+    </footer>
+
+    <script>
+        document.querySelector('form').onsubmit = e => {
+            e.preventDefault();
+            document.querySelector('small').hidden = true
+            let name = document.getElementById('name').value.trim();
+            if (name) {
+                sessionStorage.setItem('name', name);
+                location = 'list.html';
+            }
+            else {
+                document.querySelector('small').innerText = "Name is required!"
+                document.querySelector('small').hidden = false;
+                document.getElementById('name').value = "";
+                document.getElementById('name').focus();
+            }
+        };
+        window.onload = e => document.querySelector('body').hidden = false;
+    </script>
+</body>
+
+</html>
